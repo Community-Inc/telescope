@@ -29,6 +29,12 @@ class IncomingEntry
     public $type;
 
     /**
+     * The service name/ used in micro-service architecture
+     * @var
+     */
+    public $service;
+
+    /**
      * The entry's family hash.
      *
      * @var string|null
@@ -67,13 +73,17 @@ class IncomingEntry
      * Create a new incoming entry instance.
      *
      * @param  array  $content
+     * @param  string|null  $uuid
      * @return void
      */
-    public function __construct(array $content)
+    public function __construct(array $content, $uuid = null)
     {
-        $this->uuid = (string) Str::orderedUuid();
+        $this->uuid = $uuid ?: (string) Str::orderedUuid();
 
         $this->recordedAt = now();
+
+        $this->service=config('telescope.storage.database.connection');
+        $this->service=env('TELESCOPE_SERVICE','default');
 
         $this->content = array_merge($content, ['hostname' => gethostname()]);
 
@@ -118,12 +128,21 @@ class IncomingEntry
     }
 
     /**
-     * Assign the entry a family hash.
-     *
-     * @param  string  $familyHash
+     * @param string $service
      * @return $this
      */
-    public function withFamilyHash(string $familyHash)
+    public function service(string $service){
+        $this->service=$service;
+        return $this;
+    }
+
+    /**
+     * Assign the entry a family hash.
+     *
+     * @param  null|string  $familyHash
+     * @return $this
+     */
+    public function withFamilyHash($familyHash)
     {
         $this->familyHash = $familyHash;
 
@@ -181,6 +200,16 @@ class IncomingEntry
     }
 
     /**
+     * Determine if the incoming entry is a request.
+     *
+     * @return bool
+     */
+    public function isRequest()
+    {
+        return $this->type === EntryType::REQUEST;
+    }
+
+    /**
      * Determine if the incoming entry is a failed request.
      *
      * @return bool
@@ -202,6 +231,16 @@ class IncomingEntry
     }
 
     /**
+     * Determine if the incoming entry is an authorization gate check.
+     *
+     * @return bool
+     */
+    public function isGate()
+    {
+        return $this->type === EntryType::GATE;
+    }
+
+    /**
      * Determine if the incoming entry is a failed job.
      *
      * @return bool
@@ -209,7 +248,7 @@ class IncomingEntry
     public function isFailedJob()
     {
         return $this->type === EntryType::JOB &&
-               ($this->content['status'] ?? null) === 'failed';
+            ($this->content['status'] ?? null) === 'failed';
     }
 
     /**
@@ -272,6 +311,7 @@ class IncomingEntry
         return [
             'uuid' => $this->uuid,
             'batch_id' => $this->batchId,
+            'service'=>$this->service,
             'family_hash' => $this->familyHash,
             'type' => $this->type,
             'content' => $this->content,

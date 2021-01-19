@@ -19,6 +19,20 @@ return [
     'domain' => env('TELESCOPE_DOMAIN', null),
 
     /*
+   |--------------------------------------------------------------------------
+   | Telescope micro-service Name
+   |--------------------------------------------------------------------------
+   |
+   | This defines the microservice that telescope will be using to identify
+   | the micro-service that will be making the entries. The default value is set
+   | to 'default'.
+   |
+   */
+
+    'service'=>env('TELESCOPE_SERVICE','default'),
+
+
+    /*
     |--------------------------------------------------------------------------
     | Telescope Path
     |--------------------------------------------------------------------------
