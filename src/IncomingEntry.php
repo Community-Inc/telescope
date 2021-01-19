@@ -82,8 +82,7 @@ class IncomingEntry
 
         $this->recordedAt = now();
 
-        $this->service=config('telescope.storage.database.connection');
-        $this->service=env('TELESCOPE_SERVICE','default');
+        $this->service=config('telescope.service');
 
         $this->content = array_merge($content, ['hostname' => gethostname()]);
 
