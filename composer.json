@@ -1,5 +1,5 @@
 {
-    "name": "Community/telescope",
+    "name": "itcyborg/telescope",
     "description": "An elegant debug assistant for the Laravel framework.",
     "keywords": ["laravel", "monitoring", "debugging"],
     "license": "MIT",
